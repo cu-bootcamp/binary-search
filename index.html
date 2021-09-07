@@ -1,0 +1,166 @@
+<html>
+<title>Game</title>
+<body bgColor="#222222">
+<style>
+
+.itemcontainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  padding: 2pt;
+  flex-wrap: wrap;
+}
+
+.bottomtextp {
+  color: white;
+  font-size: 36pt;
+  margin-top: auto;
+  font-family: system-ui;
+}
+
+.parent {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topbutton {
+  background-color: #4b84ff; /* Blue */
+  border: none;
+  border-radius: 4pt;
+  color: white;
+  padding: 6pt 12pt;
+  text-align: center;
+  text-decoration: none;
+  font-family: system-ui;
+  font-size: 15pt;
+  display: inline-block;
+  margin: 2pt;
+  cursor: pointer;
+}
+
+.itembutton {
+  background-color: #bbbbbb; /* Gray */
+  border: none;
+  border-radius: 5pt;
+  color: black;
+  width: 2.5em;
+  height: 2.5em;
+  text-align: center;
+  font-size: 24pt;
+  font-family: monospace;
+  margin: 2pt;
+  cursor: pointer;
+}
+</style>
+
+<div class="parent">
+  <div class="reset-btn-div">
+    <button class="topbutton" onclick="reset()">Reset Game</button>
+  </div>
+  <div class="itemcontainer" id="itemcontainer">
+  </div>
+  <div class="bottomtextdiv">
+    <p class="bottomtextp" id="hinttext">Hint</p>
+  </div>
+</div>
+
+<script>
+persistentindex = 25;
+var maxindex = persistentindex
+var minindex = 0;
+var finalindex = 0;
+
+window.addEventListener("keydown", function (event) {
+
+  if (event.defaultPrevented) {
+    return;
+  }
+  
+  switch (event.key) {
+    case "x": 
+	  reset();
+	  break;
+	default:
+	  return;
+	}
+	
+  event.preventDefault();
+}, true);
+
+
+function reset (){
+  itc.replaceChildren();
+  init();
+}
+
+function init () {
+  maxindex = persistentindex;
+  minindex = 0;
+  itc = document.getElementById("itemcontainer");
+  finalindex = getRandomInt(0, maxindex);
+
+  for (var i = 0; i<=maxindex; i++){
+    let btn = document.createElement("button");
+    btn.innerHTML = (i+10).toString(36).toUpperCase();
+    btn.id = "btn-" + i;
+    btn.onclick = function() {clickfunc(this.id)};
+    btn.className = "itembutton";
+    itc.appendChild(btn);
+  }
+  document.getElementById("hinttext").innerHTML = "Press X to reset";
+}
+
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+
+function clickfunc(clicked_id) {
+  clickid = parseInt(clicked_id.split("-").pop());
+  answerid = "btn-" + finalindex;
+  
+  absel = document.getElementById(clicked_id).innerHTML;
+
+  if(clickid == finalindex){
+    for (l = 0; l<=maxindex; l++){
+      loopid = "btn-" + l;
+      document.getElementById(loopid).disabled = true;
+    }
+
+    document.getElementById(clicked_id).style.backgroundColor = "lightgreen";
+    document.getElementById(clicked_id).disabled = true;
+    document.getElementById("hinttext").innerHTML = "Yes! That's my alphabet!";
+  }
+  else if(clickid>finalindex){
+    for (j = clickid; j<=maxindex; j++){
+      loopid = "btn-" + j;
+      document.getElementById(loopid).style.backgroundColor = "lightpink";
+      document.getElementById(loopid).style.textDecoration = "line-through";
+      document.getElementById(loopid).disabled = true;
+  }
+  maxindex = clickid;
+  document.getElementById("hinttext").innerHTML = "The alphabet is smaller than " + absel + ". Go lower!";
+  }else if(clickid<finalindex){
+
+    for (k = minindex; k<=clickid; k++){
+      loopid = "btn-" + k;
+      document.getElementById(loopid).style.backgroundColor = "lightpink";
+      document.getElementById(loopid).style.textDecoration = "line-through";
+      document.getElementById(loopid).disabled = true;
+    }
+  document.getElementById("hinttext").innerHTML = "The alphabet is bigger than " + absel + ". Go higher!";
+  minindex = clickid+1;
+  }
+}
+
+init();
+
+</script>
+</body>
+</html>
